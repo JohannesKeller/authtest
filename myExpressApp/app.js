@@ -79,11 +79,11 @@ http.createServer(function (req, res) {
       //Start der Shibboleth-Authentifizierung
       $.ajax({
         url: cors + "https://felix.hs-furtwangen.de/shib/",
-        // headers: {
-          //   "Authorization": "Basic YmVja2VydGg6UzlDWjhFUkE=",
-          //   "username": "beckerth",
-          //   "password": "S9CZ8ERA"
-          // }
+        headers: {
+            "Authorization": "Basic YmVja2VydGg6UzlDWjhFUkE=",
+            "username": "beckerth",
+            "password": "S9CZ8ERA"
+          }
         })
         .done(function (data) {
           console.log("hallo");
