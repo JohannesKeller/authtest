@@ -44,8 +44,8 @@ $("#ausführen").click( function()
       var relayState = attrs[0];
       var samlRequest = attrs[1];
       
-      // console.log(samlRequest);
-      // console.log(relayState);
+      console.log(samlRequest);
+      console.log(relayState);
       
 
 
@@ -56,7 +56,8 @@ $("#ausführen").click( function()
         url: cors + "https://idp2.hs-furtwangen.de/idp/profile/SAML2/POST/SSO",
         method: "POST",
         headers: {
-          "Authorization": "Basic YmVja2VydGg6UzlDWjhFUkE="
+          "Authorization": "Basic YmVja2VydGg6UzlDWjhFUkE=",
+          'Content-Type': 'application/x-www-form-urlencoded'
           
         },
         data: {
