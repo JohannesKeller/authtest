@@ -1,0 +1,44 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    meta(http-equiv='X-UA-Compatible', content='ie=edge')
+    link(rel='stylesheet', href='https://use.fontawesome.com/releases/v5.0.13/css/all.css', integrity='sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp', crossorigin='anonymous')
+    title Shibboleth Auth
+  body
+    h1 Shibboleth Test
+    button(id='ausführen') Alle Schritte ausführen
+    table
+      tr
+        th 1. Eine Anfrage gegen Felix stellen, um ein OLAT-Session-Cookie zu bekommen.
+        th#eins
+      tr
+        th
+          | 2. GET-Request gegen https://felix.hs-furtwangen.de/shib/ Damit starten Sie die Shibboleth-Authentifizierung auf dem Felix-Server
+        th#zwei
+      tr
+        th
+          | 3. Den dort erhaltenen SAMLRequest müssen Sie dann per POST an https://idp2.hs-furtwangen.de/idp/profile/SAML2/POST/SSO schicken. Durchführung der Authentifizierung am IDP Vielleicht müssen Sie hier Benutzername und Passwort eingeben. Wenn Sie bereits eine authentifizierte Session (und ein dazugehöriges Cookie) vom IDP haben, erhalten sie direkt die SAMLResponse
+        th#drei
+      tr
+        th
+          | 4. Nachdem Sie vom IDP eine SAMLResponse erhalten haben, übermitteln Sie diese wieder per POST an https://felix.hs-furtwangen.de/Shibboleth.sso/SAML2/POST
+        th#vier
+      tr
+        th
+          | 5. Erneutes GET gegen https://felix.hs-furtwangen.de/shib/ um die Authentifizierung abzuschließen (den Redirect auf die Felix-Startseite, den Sie hier als Antwort bekommen, können Sie wahrscheinlich ignorieren)
+        th(id='fünf')
+      tr
+        th 6. Anfrage gegen Felix stellen, um Kursinfos zu erhalten.
+        th#sechs
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js')
+    script(src='javascripts/ajax.js')
+    style.
+      th {
+      border-bottom: 1px solid #ddd;
+      }
+      table {
+      width: 60%;
+      text-align: left;
+      }
