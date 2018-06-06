@@ -6,6 +6,13 @@ var logger = require('morgan');
 const cors = require('cors');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var jsdom = require('jsdom');
+const { JSDOM } = jsdom;
+const { window } = new JSDOM();
+const { document } = (new JSDOM('')).window;
+global.document = document;
+
+var $ = jQuery = require('jquery')(window);
 
 var app = express();
 
@@ -24,6 +31,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
@@ -39,5 +48,154 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+var http = require('http');
+http.createServer(function (req, res) {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end('Hallo Welt!\n');
+    var cors = "";
+    
+    
+    
+  }).listen(1337, "127.0.0.1");
+
+
+  console.log("hallo");
+  $.ajax({
+    url: cors + "https://felix.hs-furtwangen.de/restapi/repo/courses/96536472673363",
+    method: "GET",
+    headers: {
+          "Authorization": "Basic YmVja2VydGg6UzlDWjhFUkE=",
+          "Access-Control-Allow-Credentials": "true"
+          //beckerth: Basic YmVja2VydGg6UzlDWjhFUkE= /  beckerth.hfu: Basic YmVja2VydGguaGZ1OlJlc3QjMjAxNw==
+        }
+      }).fail(function (data) {
+        // console.log(data);
+        console.log("hallo");
+        
+        
+        
+        
+      //Start der Shibboleth-Authentifizierung
+      $.ajax({
+        url: cors + "https://felix.hs-furtwangen.de/shib/",
+        // headers: {
+          //   "Authorization": "Basic YmVja2VydGg6UzlDWjhFUkE=",
+          //   "username": "beckerth",
+          //   "password": "S9CZ8ERA"
+          // }
+        })
+        .done(function (data) {
+          console.log("hallo");
+          console.log(data);
+          var dataXML = $.parseXML(data);
+          var input = $("input", dataXML);
+          var relayState;
+          var samlRequest;
+          var attrs = [];
+          input.each(function () {
+            //console.log($(this).attr("value"));
+            attrs.push($(this).attr("value"));
+          })
+          var relayState = attrs[0];
+          var samlRequest = attrs[1];
+          
+          // console.log(samlRequest);
+          // console.log(relayState);
+          
+          
+          
+    
+          //SAMLRequest per POST verschicken
+          $.ajax({
+            url: cors + "https://idp2.hs-furtwangen.de/idp/profile/SAML2/POST/SSO",
+            method: "POST",
+            headers: {
+              "Authorization": "Basic YmVja2VydGg6UzlDWjhFUkE=",
+              'Content-Type': 'application/x-www-form-urlencoded'
+              
+            },
+            data: {
+              "RelayState": relayState,
+              "SAMLRequest": samlRequest,
+            },
+            contentType: "application/x-www-form-urlencoded"
+            
+          })
+          .done(function(data){
+            var dataXML = $.parseXML(data);
+            var samlResponse;
+            var input = $("input", dataXML);
+            var attrs1 = [];        
+            input.each(function(){
+              attrs1.push($(this).attr("value"))
+            });
+            var samlResponse = attrs1[1];
+            console.log(data);
+            //console.log(samlResponse);
+            // console.log(data);
+            //console.log(dataXML);
+            
+    
+    
+    
+    
+            //SAMLResponse per POST verschicken
+            $.ajax({
+              url: cors + "https://felix.hs-furtwangen.de/Shibboleth.sso/SAML2/POST",
+              method: "POST",
+              headers: {"Authorization": "Basic YmVja2VydGg6UzlDWjhFUkE="}, //YmVja2VydGg6UzlDWjhFUkE=
+              data: {
+                "SAMLResponse": samlResponse
+              }
+            })
+            .done(function(data){
+              console.log(data);
+              
+              
+            
+              
+              //Authentifizierung abschließen
+              $.ajax({
+                url: cors + "https://felix.hs-furtwangen.de/shib/",
+                method: "GET",
+                headers: {"Authorization": "Basic YmVja2VydGg6UzlDWjhFUkE="}
+                
+              }).done(function(data){
+    
+    
+    
+    
+    
+                var cors = "";
+                $.ajax({
+                  url: cors + "https://felix.hs-furtwangen.de/restapi/repo/courses/96536472673363",
+                  method: "GET",
+                  headers: {"Authorization": "Basic YmVja2VydGg6UzlDWjhFUkE="},
+                  // beforeSend: function( xhr ) {
+                    //   xhr.setRequestHeader("Authorization", "Basic YmVja2VydGg6UzlDWjhFUkE=");
+                    //        },
+                    // beforeSend: function( xhr ) {
+                      //   xhr.setRequestHeader("Access-Control-Allow-Headers", "X-Requested-With");
+                      //        },
+                      
+                    }).done(function(data){
+                      console.log(data);
+                    }).fail(function (data) {
+                      console.log(data);
+                    });
+                    
+                
+              })
+              
+            })
+            
+            
+          })   
+        });
+      });
+
+
+console.log('Server running at http://127.0.0.1:1337/');
 
 module.exports = app;
