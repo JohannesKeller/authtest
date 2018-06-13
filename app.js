@@ -107,20 +107,33 @@ http.createServer(function (req, res) {
           
                  console.log(samlRequest);
                 console.log(relayState);
-                console.log(request.cookie("JSESSIONID"));
+                // console.log(request.cookie("JSESSIONID"));
 
                 var data = '{data" {"RelayState":'+relayState+',"SAMLRequest":'+samlRequest+"}}";
               //  var json_obj = JSON.parse(data);
                 
                 request({
-                  headers: {"Authorization": "Basic YmVja2VydGg6UzlDWjhFUkE=",'Content-Type': 'application/x-www-form-urlencoded'},
+                  headers: {"Authorization": "Basic YmVja2VydGg6UzlDWjhFUkE="},
                   url: 'https://idp2.hs-furtwangen.de/idp/profile/SAML2/POST/SSO',
                   method: "POST",
                   Cookie: jsessionid,
                   // data: {"RelayState": relayState,"SAMLRequest": samlRequest,},
-                  form:    data
+                  data: {
+                    "RelayState": relayState,
+                    "SAMLRequest": samlRequest,
+                  },
+                  contentType: "application/x-www-form-urlencoded"
                   
                    }, function(error, response, body){
+
+                    var setcookie = response.headers["set-cookie"];
+    if ( setcookie ) {
+      setcookie.forEach(
+        function ( cookiestr ) {
+          console.log( "jztfdzrCOOKIE:" + cookiestr );
+        }
+      );
+    }
                       console.log(response["body"]);
                       var dataXML = $.parseXML(response);
                       var samlResponse;
